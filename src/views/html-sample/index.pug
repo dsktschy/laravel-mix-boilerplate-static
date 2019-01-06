@@ -1,0 +1,9 @@
+extends /partials/_layout
+
+block head
+  <title>#{seed.variables.general.title} | #{seed.variables.pages.htmlSample.title}</title>
+
+block content
+  <h1>#{seed.variables.pages.htmlSample.title}</h1>
+  <p>#{paragraph}</p>
+  <img src="#{mix('/assets/images/app.png')}">
