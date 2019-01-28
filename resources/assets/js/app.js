@@ -3,4 +3,4 @@ class Sample {
     alert(string)
   }
 }
-new Sample('sample')
+new Sample('Laravel Mix Boilerplate')
