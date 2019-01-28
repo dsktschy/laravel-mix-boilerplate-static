@@ -14,19 +14,19 @@ mix.pug = require('laravel-mix-pug');
  |
  */
 
-// Clean dist directory
-fs.removeSync('dist/')
+// Clean public directory
+fs.removeSync('public/')
 mix
   // Required to put mix-manifest.json in correct directory
-  .setPublicPath('dist')
-  .js('src/assets/js/app.js', 'dist/assets/js')
-  .sass('src/assets/css/app.scss', 'dist/assets/css')
+  .setPublicPath('public')
+  .js('resources/assets/js/app.js', 'public/assets/js')
+  .sass('resources/assets/css/app.scss', 'public/assets/css')
   .pug(
-    'src/views/**/[!_]*.pug',
-    'dist',
+    'resources/views/**/[!_]*.pug',
+    'public',
     {
       // Path to directory that contains JSON or YAML
-      seeds: 'src',
+      seeds: 'resources',
       // Variables
       locals: {
         paragraph: 'foobar',
@@ -34,26 +34,26 @@ mix
         mix: (filePath = '') => filePath + '?v=' + Date.now()
       },
       // Base directory
-      excludePath: 'src/views',
+      excludePath: 'resources/views',
       // Options for Pug
       pug: {
         // Required to include partials with root relative path
-        basedir: 'src/views'
+        basedir: 'resources/views'
       }
     }
   )
   .copyWatched(
-    'src/assets/images/**/*',
-    'dist/assets/images',
-    { base: 'src/assets/images' }
+    'resources/assets/images/**/*',
+    'public/assets/images',
+    { base: 'resources/assets/images' }
   )
   .browserSync({
-    server: 'dist',
+    server: 'public',
     proxy: false,
-    files: [ 'dist/**/*.*' ],
+    files: [ 'public/**/*.*' ],
     open: false
   })
-  // It's difficult handle dist/mix-manifest.json from static pages
+  // It's difficult handle public/mix-manifest.json from static pages
   // .version()
 
 // Full API
