@@ -1,7 +1,7 @@
-const mix = require('laravel-mix');
-const fs = require('fs-extra');
-require('laravel-mix-copy-watched');
-mix.pug = require('laravel-mix-pug');
+const mix = require('laravel-mix')
+const fs = require('fs-extra')
+require('laravel-mix-copy-watched')
+mix.pug = require('laravel-mix-pug')
 
 // Clean public directory
 fs.removeSync('public/')
