@@ -3,21 +3,10 @@ const fs = require('fs-extra');
 require('laravel-mix-copy-watched');
 mix.pug = require('laravel-mix-pug');
 
-/*
- |--------------------------------------------------------------------------
- | Mix Asset Management
- |--------------------------------------------------------------------------
- |
- | Mix provides a clean, fluent API for defining some Webpack build steps
- | for your Laravel application. By default, we are compiling the Sass
- | file for your application, as well as bundling up your JS files.
- |
- */
-
 // Clean public directory
 fs.removeSync('public/')
 mix
-  // Required to put mix-manifest.json in correct directory
+  // Set output directory of mix-manifest.json
   .setPublicPath('public')
   .js('resources/assets/js/app.js', 'public/assets/js')
   .sass('resources/assets/css/app.scss', 'public/assets/css')
