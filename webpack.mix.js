@@ -8,8 +8,19 @@ fs.removeSync('public/')
 mix
   // Set output directory of mix-manifest.json
   .setPublicPath('public')
-  .js('resources/assets/js/app.js', 'public/assets/js')
-  .sass('resources/assets/css/app.scss', 'public/assets/css')
+  .js(
+    'resources/assets/js/app.js',
+    'public/assets/js'
+  )
+  .sass(
+    'resources/assets/css/app.scss',
+    'public/assets/css'
+  )
+  .copyWatched(
+    'resources/assets/images/**/*.{jpg,jpeg,png,gif}',
+    'public/assets/images',
+    { base: 'resources/assets/images' }
+  )
   .pug(
     'resources/views/**/[!_]*.pug',
     'public',
@@ -31,16 +42,11 @@ mix
       }
     }
   )
-  .copyWatched(
-    'resources/assets/images/**/*',
-    'public/assets/images',
-    { base: 'resources/assets/images' }
-  )
   .browserSync({
+    open: false,
     server: 'public',
     proxy: false,
-    files: [ 'public/**/*.*' ],
-    open: false
+    files: [ 'public/**/*.*' ]
   })
   // It's difficult handle public/mix-manifest.json from static pages
   // .version()
