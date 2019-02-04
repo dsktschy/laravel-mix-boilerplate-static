@@ -53,6 +53,27 @@ mix
     }
   )
   .webpackConfig({
+    // Prettier Loader has problem that it cause file saving one more time
+    // Therefore following loaders are triggered twice
+    // If this problem is not allowed,
+    // you can turn off Prettier Loader by removing the following two module.rules
+    // Details here: https://github.com/iamolegga/prettier-loader/issues/1
+    module: {
+      rules: [
+        {
+          test: /\.jsx?$/,
+          loader: 'prettier-loader',
+          exclude: /node_modules/,
+          options: { parser: 'babel' }
+        },
+        {
+          test: /\.(scss|css)?$/,
+          loader: 'prettier-loader',
+          exclude: /node_modules/,
+          options: { parser: 'scss' }
+        }
+      ]
+    },
     plugins: [
       new SVGSpritemapPlugin(
         // Subdirectories (svg/**/*.svg) are not allowed
@@ -122,6 +143,12 @@ else {
     // If setting: 'wp-content/public/**/*',
     // injection of changes such as CSS will be not available
     // https://github.com/JeffreyWay/laravel-mix/issues/1053
+    // Prettier Loader has problem that it cause file saving one more time
+    // Therefore reload / injection are triggered twice
+    // Options of BrowserSync (e.g. reloadDebounce) can not prevent this
+    // If this problem is not allowed, you can turn off Prettier Loader
+    // by removing two module.rules in argument of webpackConfig method
+    // https://github.com/iamolegga/prettier-loader/issues/1
     files: [
       'public/assets/**/*',
       'public/**/*.html'

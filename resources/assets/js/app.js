@@ -1,6 +1,6 @@
 class Sample {
-  constructor (string) {
-    alert(string)
+  constructor(string) {
+    alert(string);
   }
 }
-new Sample('Laravel Mix Boilerplate')
+new Sample("Laravel Mix Boilerplate");
