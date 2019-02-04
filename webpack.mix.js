@@ -7,8 +7,11 @@ const imageminMozjpeg = require('imagemin-mozjpeg')
 const imageminPngquant = require('imagemin-pngquant')
 const imageminGifsicle = require('imagemin-gifsicle')
 const globby = require('globby')
+const SVGSpritemapPlugin = require('svg-spritemap-webpack-plugin')
 require('laravel-mix-copy-watched')
 mix.pug = require('laravel-mix-pug')
+
+const svgDummyModuleName = 'assets/js/.svg-dummy-module'
 
 // Clean public directory
 fs.removeSync('public/')
@@ -49,6 +52,36 @@ mix
       }
     }
   )
+  .webpackConfig({
+    plugins: [
+      new SVGSpritemapPlugin(
+        // Subdirectories (svg/**/*.svg) are not allowed
+        // Because same ID attribute is output multiple times,
+        // if file names are duplicated among multiple directories
+        'resources/assets/svg/sprite/*.svg',
+        {
+          output: {
+            filename: 'assets/svg/sprite.svg',
+            // In development, keep chunk file without deletion
+            // Because error occurs if chunk file has deleted when creating mix-manifest.json
+            chunk: {
+              name: svgDummyModuleName,
+              keep: true
+            },
+            svgo: {
+              plugins: [
+                { removeTitle: true },
+                { cleanupIDs: true },
+                { removeAttrs: { attrs: '(fill|stroke|data.*)' } },
+                { addClassesToSVGElement: { className: 'svg-sprite' } }
+              ]
+            },
+            svg4everybody: true
+          }
+        }
+      )
+    ]
+  })
   // It's difficult handle public/mix-manifest.json from static pages
   // .version()
 
@@ -71,6 +104,12 @@ if (process.env.NODE_ENV === "production") {
         ]
       }).catch(error => { throw error })
     }
+    // In production, delete chunk file for SVG sprite
+    fs.removeSync(`public/${svgDummyModuleName}.js`)
+    const pathToManifest = 'public/mix-manifest.json'
+    const manifest = require(`./${pathToManifest}`)
+    delete manifest[`/${svgDummyModuleName}.js`]
+    fs.writeFileSync(path.resolve(pathToManifest), JSON.stringify(manifest), 'utf-8')
   })
 }
 
