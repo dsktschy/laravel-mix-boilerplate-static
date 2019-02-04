@@ -46,7 +46,13 @@ mix
     open: false,
     server: 'public',
     proxy: false,
-    files: [ 'public/**/*.*' ]
+    // If setting: 'wp-content/public/**/*',
+    // injection of changes such as CSS will be not available
+    // https://github.com/JeffreyWay/laravel-mix/issues/1053
+    files: [
+      'public/assets/**/*',
+      'public/**/*.html'
+    ]
   })
   // It's difficult handle public/mix-manifest.json from static pages
   // .version()
