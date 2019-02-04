@@ -49,21 +49,10 @@ mix
       }
     }
   )
-  .browserSync({
-    open: false,
-    server: 'public',
-    proxy: false,
-    // If setting: 'wp-content/public/**/*',
-    // injection of changes such as CSS will be not available
-    // https://github.com/JeffreyWay/laravel-mix/issues/1053
-    files: [
-      'public/assets/**/*',
-      'public/**/*.html'
-    ]
-  })
   // It's difficult handle public/mix-manifest.json from static pages
   // .version()
 
+// Only in production mode
 if (process.env.NODE_ENV === "production") {
   mix.then(async () => {
     // Execute imagemin for each file in loop
@@ -82,6 +71,22 @@ if (process.env.NODE_ENV === "production") {
         ]
       }).catch(error => { throw error })
     }
+  })
+}
+
+// Only in development mode
+else {
+  mix.browserSync({
+    open: false,
+    server: 'public',
+    proxy: false,
+    // If setting: 'wp-content/public/**/*',
+    // injection of changes such as CSS will be not available
+    // https://github.com/JeffreyWay/laravel-mix/issues/1053
+    files: [
+      'public/assets/**/*',
+      'public/**/*.html'
+    ]
   })
 }
 
