@@ -1,5 +1,12 @@
 const mix = require('laravel-mix')
+const Log = require('laravel-mix/src/Log')
 const fs = require('fs-extra')
+const path = require('path')
+const imagemin = require('imagemin')
+const imageminMozjpeg = require('imagemin-mozjpeg')
+const imageminPngquant = require('imagemin-pngquant')
+const imageminGifsicle = require('imagemin-gifsicle')
+const globby = require('globby')
 require('laravel-mix-copy-watched')
 mix.pug = require('laravel-mix-pug')
 
@@ -56,6 +63,27 @@ mix
   })
   // It's difficult handle public/mix-manifest.json from static pages
   // .version()
+
+if (process.env.NODE_ENV === "production") {
+  mix.then(async () => {
+    // Execute imagemin for each file in loop
+    // Because imagemin can't keep hierarchical structure
+    const targets = globby.sync(
+      'public/assets/images/**/*.{jpg,jpeg,png,gif}',
+      { onlyFiles: true }
+    )
+    for (let target of targets) {
+      Log.feedback(`Optimizing ${target}`)
+      await imagemin([ target ], path.dirname(target), {
+        plugins: [
+          imageminMozjpeg({ quality: 80 }),
+          imageminPngquant({ quality: [ 0.65, 0.8 ] }),
+          imageminGifsicle()
+        ]
+      }).catch(error => { throw error })
+    }
+  })
+}
 
 // Full API
 // mix.js(src, output);
