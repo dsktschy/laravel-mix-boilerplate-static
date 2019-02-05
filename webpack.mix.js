@@ -37,9 +37,8 @@ mix
     {
       // Path to directory that contains JSON or YAML
       seeds: 'resources',
-      // Variables
+      // Variables and functions
       locals: {
-        paragraph: 'foobar',
         // Function for cache busting
         mix: (filePath = '') => filePath + '?v=' + Date.now(),
         // Function to create path for SVG sprite, according to NODE_ENV

@@ -5,5 +5,32 @@ block head
 
 block content
   h1 #{seed.variables.general.title}
-  p #{paragraph}
-  img(src=mix('/assets/images/app.png'))
+  ul
+    li.gif
+      img(
+        src=mix('/assets/images/sample.gif')
+        alt="SAMPLE.GIF"
+      )
+    li.jpeg
+      img(
+        src=mix('/assets/images/sample.jpeg')
+        alt="SAMPLE.JPEG"
+      )
+    li.jpg
+      img(
+        src=mix('/assets/images/sample.jpg')
+        alt="SAMPLE.JPG"
+      )
+    li.png
+      img(
+        src=mix('/assets/images/sample.png')
+        alt="SAMPLE.PNG"
+      )
+    li.svg-a
+      svg
+        title SAMPLE-A.SVG
+        use(xlink:href=svgSprite('/assets/svg/sprite.svg', '#sprite-sample-a'))
+    li.svg-b
+      svg
+        title SAMPLE-B.SVG
+        use(xlink:href=svgSprite('/assets/svg/sprite.svg', '#sprite-sample-b'))
