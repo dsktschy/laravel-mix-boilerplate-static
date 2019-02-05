@@ -41,7 +41,15 @@ mix
       locals: {
         paragraph: 'foobar',
         // Function for cache busting
-        mix: (filePath = '') => filePath + '?v=' + Date.now()
+        mix: (filePath = '') => filePath + '?v=' + Date.now(),
+        // Function to create path for SVG sprite, according to NODE_ENV
+        // Requires path to sprite SVG file and ID
+        // In development, if SVG is included in pug,
+        // injection of changes such as CSS by BrowserSync is prevented
+        // Because svg-spritemap-webpack-plugin reacts for all changes,
+        // and it causes pug recompile and browser reloading
+        svgSprite: (filePath = '', id = '') =>
+          process.env.NODE_ENV === 'production' ? id : filePath + id
       },
       // Base directory
       excludePath: 'resources/views',
@@ -107,7 +115,7 @@ mix
   // .version()
 
 // Only in production mode
-if (process.env.NODE_ENV === "production") {
+if (process.env.NODE_ENV === 'production') {
   mix.then(async () => {
     // Execute imagemin for each file in loop
     // Because imagemin can't keep hierarchical structure
