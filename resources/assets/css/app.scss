@@ -52,3 +52,10 @@ li {
   height: 17px;
   color: blue;
 }
+.js-target {
+  opacity: 0;
+  transition: opacity 0.3s;
+  &.is-active {
+    opacity: 1;
+  }
+}

@@ -1,6 +1,9 @@
-class Sample {
-  constructor(string) {
-    alert(string);
-  }
-}
-new Sample("Laravel Mix Boilerplate");
+import Sample from "./sample";
+
+const sample = new Sample({
+  elements: [...document.querySelectorAll(".js-target")],
+  classNameActive: "is-active"
+});
+setTimeout(() => {
+  sample.activate();
+}, 500);
