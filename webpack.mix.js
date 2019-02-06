@@ -143,8 +143,10 @@ if (process.env.NODE_ENV === 'production') {
 
 // Only in development mode
 else {
-  mix.browserSync({
+  const options = {
     open: false,
+    host: process.env.BROWSER_SYNC_HOST || 'localhost',
+    port: process.env.BROWSER_SYNC_PORT || 3000,
     server: 'public',
     proxy: false,
     // If setting: 'wp-content/public/**/*',
@@ -160,5 +162,11 @@ else {
       'public/assets/**/*',
       'public/**/*.html'
     ]
-  })
+  }
+  const cert = process.env.BROWSER_SYNC_HTTPS_CERT
+  const key = process.env.BROWSER_SYNC_HTTPS_KEY
+  if (cert && key) {
+    options.https = { cert, key }
+  }
+  mix.browserSync(options)
 }
