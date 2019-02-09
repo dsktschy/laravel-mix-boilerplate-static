@@ -126,9 +126,9 @@ if (process.env.NODE_ENV === 'production') {
       Log.feedback(`Optimizing ${target}`)
       await imagemin([ target ], path.dirname(target), {
         plugins: [
-          imageminMozjpeg({ quality: 80 }),
-          imageminPngquant({ quality: [ 0.65, 0.8 ] }),
-          imageminGifsicle()
+          imageminMozjpeg({ quality: 100 }), // 0 ~ 100
+          imageminPngquant({ quality: [ 1, 1 ] }), // 0 ~ 1
+          imageminGifsicle({ optimizationLevel: 3 }) // 1 ~ 3
         ]
       }).catch(error => { throw error })
     }
