@@ -10,6 +10,7 @@ const globby = require('globby')
 const SVGSpritemapPlugin = require('svg-spritemap-webpack-plugin')
 require('laravel-mix-copy-watched')
 require('laravel-mix-eslint')
+require('laravel-mix-stylelint')
 mix.pug = require('laravel-mix-pug')
 
 const svgDummyModuleName = 'assets/js/.svg-dummy-module'
@@ -28,6 +29,7 @@ mix
     'resources/assets/css/app.scss',
     'public/assets/css'
   )
+  .stylelint()
   .copyWatched(
     'resources/assets/images/**/*.{jpg,jpeg,png,gif}',
     'public/assets/images',
