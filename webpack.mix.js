@@ -147,6 +147,16 @@ if (process.env.NODE_ENV === 'production') {
 
 // Only in development mode
 else {
+  // Prettier Loader has problem that it cause file saving one more time
+  // Therefore reload / injection are triggered twice
+  // Options of BrowserSync (e.g. reloadDebounce) can not prevent this
+  // If this problem is not allowed, you can turn off Prettier Loader
+  // by removing two module.rules in argument of webpackConfig method
+  // https://github.com/iamolegga/prettier-loader/issues/1
+  // Reloading is necessary to see the change of the SVG file
+  // But BrowserSync execute ingection for SVG changes
+  // Options of BrowserSync can not change this behavior
+  // https://github.com/BrowserSync/browser-sync/issues/1287
   const options = {
     open: false,
     host: process.env.BROWSER_SYNC_HOST || 'localhost',
@@ -156,12 +166,6 @@ else {
     // If setting: 'wp-content/public/**/*',
     // injection of changes such as CSS will be not available
     // https://github.com/JeffreyWay/laravel-mix/issues/1053
-    // Prettier Loader has problem that it cause file saving one more time
-    // Therefore reload / injection are triggered twice
-    // Options of BrowserSync (e.g. reloadDebounce) can not prevent this
-    // If this problem is not allowed, you can turn off Prettier Loader
-    // by removing two module.rules in argument of webpackConfig method
-    // https://github.com/iamolegga/prettier-loader/issues/1
     files: [
       'public/assets/**/*',
       'public/**/*.html'
