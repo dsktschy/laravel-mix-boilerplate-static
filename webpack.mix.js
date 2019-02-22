@@ -44,7 +44,7 @@ mix
       // Variables and functions
       locals: {
         // Function for cache busting
-        mix: (filePath = '') => filePath + '?v=' + Date.now(),
+        mix: (filePath = '') => filePath + '?id=' + Date.now(),
         // Function to create path for SVG sprite, according to NODE_ENV
         // Requires path to sprite SVG file and ID
         // In development, if SVG is included in pug,
