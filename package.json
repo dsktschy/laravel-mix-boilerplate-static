@@ -1,7 +1,7 @@
 {
   "name": "laravel-mix-boilerplate",
   "version": "0.0.0",
-  "description": "Boilerplate of Laravel Mix",
+  "description": "Boilerplate for WordPress and Static site, based on Laravel Mix",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
