@@ -14,37 +14,39 @@ require('laravel-mix-stylelint')
 mix.pug = require('laravel-mix-pug')
 
 const svgDummyModuleName = 'assets/js/.svg-dummy-module'
+const resourcesDirName = 'resources'
+const publicDirName = 'public'
 
 // Clean public directory
-fs.removeSync('public/')
+fs.removeSync(publicDirName)
 
 mix
   // Set output directory of mix-manifest.json
-  .setPublicPath('public')
+  .setPublicPath(publicDirName)
   // It's difficult handle public/mix-manifest.json from static pages
   // Can use function of Pug instead of PHP, to set parameter for cache busting
   // .version()
   .js(
-    'resources/assets/js/app.js',
-    'public/assets/js'
+    `${resourcesDirName}/assets/js/app.js`,
+    `${publicDirName}/assets/js`
   )
   .eslint()
   .sass(
-    'resources/assets/css/app.scss',
-    'public/assets/css'
+    `${resourcesDirName}/assets/css/app.scss`,
+    `${publicDirName}/assets/css`
   )
   .stylelint()
   .copyWatched(
-    'resources/assets/images/**/*.{jpg,jpeg,png,gif}',
-    'public/assets/images',
-    { base: 'resources/assets/images' }
+    `${resourcesDirName}/assets/images/**/*.{jpg,jpeg,png,gif}`,
+    `${publicDirName}/assets/images`,
+    { base: `${resourcesDirName}/assets/images` }
   )
   .pug(
-    'resources/views/**/[!_]*.pug',
-    'public',
+    `${resourcesDirName}/views/**/[!_]*.pug`,
+    publicDirName,
     {
       // Path to directory that contains JSON or YAML
-      seeds: 'resources',
+      seeds: resourcesDirName,
       // Variables and functions
       locals: {
         // Function for cache busting
@@ -59,11 +61,11 @@ mix
           process.env.NODE_ENV === 'production' ? id : filePath + id
       },
       // Base directory
-      excludePath: 'resources/views',
+      excludePath: `${resourcesDirName}/views`,
       // Options for Pug
       pug: {
         // Required to include partials with root relative path
-        basedir: 'resources/views'
+        basedir: `${resourcesDirName}/views`
       }
     }
   )
@@ -73,7 +75,7 @@ mix
         // Subdirectories (svg/**/*.svg) are not allowed
         // Because same ID attribute is output multiple times,
         // if file names are duplicated among multiple directories
-        'resources/assets/svg/sprite/*.svg',
+        `${resourcesDirName}/assets/svg/sprite/*.svg`,
         {
           output: {
             filename: 'assets/svg/sprite.svg',
@@ -104,7 +106,7 @@ if (process.env.NODE_ENV === 'production') {
     // Execute imagemin for each file in loop
     // Because imagemin can't keep hierarchical structure
     const targets = globby.sync(
-      'public/assets/images/**/*.{jpg,jpeg,png,gif}',
+      `${publicDirName}/assets/images/**/*.{jpg,jpeg,png,gif}`,
       { onlyFiles: true }
     )
     for (let target of targets) {
@@ -118,8 +120,8 @@ if (process.env.NODE_ENV === 'production') {
       }).catch(error => { throw error })
     }
     // In production, delete chunk file for SVG sprite
-    fs.removeSync(`public/${svgDummyModuleName}.js`)
-    const pathToManifest = 'public/mix-manifest.json'
+    fs.removeSync(`${publicDirName}/${svgDummyModuleName}.js`)
+    const pathToManifest = `${publicDirName}/mix-manifest.json`
     const manifest = require(`./${pathToManifest}`)
     delete manifest[`/${svgDummyModuleName}.js`]
     fs.writeFileSync(path.resolve(pathToManifest), JSON.stringify(manifest), 'utf-8')
@@ -136,14 +138,14 @@ else {
     open: false,
     host: process.env.BROWSER_SYNC_HOST || 'localhost',
     port: process.env.BROWSER_SYNC_PORT || 3000,
-    server: 'public',
+    server: publicDirName,
     proxy: false,
     // If setting: 'wp-content/public/**/*',
     // injection of changes such as CSS will be not available
     // https://github.com/JeffreyWay/laravel-mix/issues/1053
     files: [
-      'public/assets/**/*',
-      'public/**/*.html'
+      `${publicDirName}/assets/**/*`,
+      `${publicDirName}/**/*.html`
     ]
   }
   const cert = process.env.BROWSER_SYNC_HTTPS_CERT
