@@ -64,27 +64,6 @@ mix
     }
   )
   .webpackConfig({
-    // Prettier Loader has problem that it cause file saving one more time
-    // Therefore following loaders are triggered twice
-    // If this problem is not allowed,
-    // you can turn off Prettier Loader by removing the following two module.rules
-    // Details here: https://github.com/iamolegga/prettier-loader/issues/1
-    module: {
-      rules: [
-        {
-          test: /\.jsx?$/,
-          loader: 'prettier-loader',
-          exclude: /node_modules/,
-          options: { parser: 'babel' }
-        },
-        {
-          test: /\.(scss|css)?$/,
-          loader: 'prettier-loader',
-          exclude: /node_modules/,
-          options: { parser: 'scss' }
-        }
-      ]
-    },
     plugins: [
       new SVGSpritemapPlugin(
         // Subdirectories (svg/**/*.svg) are not allowed
@@ -147,12 +126,6 @@ if (process.env.NODE_ENV === 'production') {
 
 // Only in development mode
 else {
-  // Prettier Loader has problem that it cause file saving one more time
-  // Therefore reload / injection are triggered twice
-  // Options of BrowserSync (e.g. reloadDebounce) can not prevent this
-  // If this problem is not allowed, you can turn off Prettier Loader
-  // by removing two module.rules in argument of webpackConfig method
-  // https://github.com/iamolegga/prettier-loader/issues/1
   // Reloading is necessary to see the change of the SVG file
   // But BrowserSync execute ingection for SVG changes
   // Options of BrowserSync can not change this behavior
