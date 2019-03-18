@@ -17,9 +17,13 @@ const svgDummyModuleName = 'assets/js/.svg-dummy-module'
 
 // Clean public directory
 fs.removeSync('public/')
+
 mix
   // Set output directory of mix-manifest.json
   .setPublicPath('public')
+  // It's difficult handle public/mix-manifest.json from static pages
+  // Can use function of Pug instead of PHP, to set parameter for cache busting
+  // .version()
   .js(
     'resources/assets/js/app.js',
     'public/assets/js'
@@ -93,8 +97,6 @@ mix
       )
     ]
   })
-  // It's difficult handle public/mix-manifest.json from static pages
-  // .version()
 
 // Only in production mode
 if (process.env.NODE_ENV === 'production') {
