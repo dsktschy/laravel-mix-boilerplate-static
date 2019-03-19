@@ -140,7 +140,7 @@ else {
     port: process.env.BROWSER_SYNC_PORT || 3000,
     server: publicDirName,
     proxy: false,
-    // If setting: 'wp-content/public/**/*',
+    // If this setting is 'wp-content/public/**/*',
     // injection of changes such as CSS will be not available
     // https://github.com/JeffreyWay/laravel-mix/issues/1053
     files: [
