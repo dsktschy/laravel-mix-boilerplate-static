@@ -25,6 +25,7 @@
     "laravel-mix": "^4.0.14",
     "laravel-mix-copy-watched": "^2.0.1",
     "laravel-mix-eslint": "^0.1.2",
+    "laravel-mix-polyfill": "^1.0.0",
     "laravel-mix-pug": "git+https://github.com/dsktschy/laravel-mix-pug.git#develop-temporary",
     "laravel-mix-stylelint": "^0.2.0",
     "pug": "^2.0.3",

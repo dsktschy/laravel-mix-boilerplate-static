@@ -8,6 +8,7 @@ const imageminPngquant = require('imagemin-pngquant')
 const imageminGifsicle = require('imagemin-gifsicle')
 const globby = require('globby')
 const SVGSpritemapPlugin = require('svg-spritemap-webpack-plugin')
+require('laravel-mix-polyfill')
 require('laravel-mix-copy-watched')
 require('laravel-mix-eslint')
 require('laravel-mix-stylelint')
@@ -26,6 +27,7 @@ mix
   // It's difficult handle public/mix-manifest.json from static pages
   // Can use function of Pug instead of PHP, to set parameter for cache busting
   // .version()
+  .polyfill()
   .js(
     `${resourcesDirName}/assets/js/app.js`,
     `${publicDirName}/assets/js`
