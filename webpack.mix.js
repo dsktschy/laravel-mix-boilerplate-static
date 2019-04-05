@@ -121,12 +121,9 @@ if (process.env.NODE_ENV === 'production') {
         ]
       }).catch(error => { throw error })
     }
-    // In production, delete chunk file for SVG sprite
+    // In production, delete unnecesary files
     fs.removeSync(`${publicDirName}/${svgDummyModuleName}.js`)
-    const pathToManifest = `${publicDirName}/mix-manifest.json`
-    const manifest = require(`./${pathToManifest}`)
-    delete manifest[`/${svgDummyModuleName}.js`]
-    fs.writeFileSync(path.resolve(pathToManifest), JSON.stringify(manifest), 'utf-8')
+    fs.removeSync(`${publicDirName}/mix-manifest.json`)
   })
 }
 
