@@ -39,7 +39,7 @@ mix
   )
   .stylelint()
   .copyWatched(
-    `${resourcesDirName}/assets/images/**/*.{jpg,jpeg,png,gif}`,
+    `${resourcesDirName}/assets/images`,
     `${publicDirName}/assets/images`,
     { base: `${resourcesDirName}/assets/images` }
   )
