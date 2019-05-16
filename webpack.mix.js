@@ -27,7 +27,7 @@ mix
   // It's difficult handle public/mix-manifest.json from static pages
   // Can use function of Pug instead of PHP, to set parameter for cache busting
   // .version()
-  .polyfill()
+  .polyfill({ corejs: 3 })
   .js(
     `${resourcesDirName}/assets/js/app.js`,
     `${publicDirName}/assets/js`
