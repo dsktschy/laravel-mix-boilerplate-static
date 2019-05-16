@@ -13,6 +13,7 @@
   "author": "dsktschy",
   "license": "ISC",
   "devDependencies": {
+    "babel-eslint": "^10.0.1",
     "browser-sync": "^2.26.5",
     "browser-sync-webpack-plugin": "^2.0.1",
     "eslint": "^5.14.1",
