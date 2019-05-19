@@ -1,17 +1,12 @@
 const mix = require('laravel-mix')
-const Log = require('laravel-mix/src/Log')
 const fs = require('fs-extra')
-const path = require('path')
-const imagemin = require('imagemin')
-const imageminMozjpeg = require('imagemin-mozjpeg')
-const imageminPngquant = require('imagemin-pngquant')
-const imageminGifsicle = require('imagemin-gifsicle')
-const globby = require('globby')
+const multimatch = require('multimatch')
 const SVGSpritemapPlugin = require('svg-spritemap-webpack-plugin')
 require('laravel-mix-polyfill')
 require('laravel-mix-copy-watched')
 require('laravel-mix-eslint')
 require('laravel-mix-stylelint')
+require('laravel-mix-imagemin')
 mix.pug = require('laravel-mix-pug')
 
 const svgDummyModuleName = 'assets/js/.svg-dummy-module'
@@ -27,7 +22,7 @@ mix
   // It's difficult handle public/mix-manifest.json from static pages
   // Can use function of Pug instead of PHP, to set parameter for cache busting
   // .version()
-  .polyfill({ corejs: 3 })
+  .polyfill()
   .js(
     `${resourcesDirName}/assets/js/app.js`,
     `${publicDirName}/assets/js`
@@ -38,11 +33,6 @@ mix
     `${publicDirName}/assets/css`
   )
   .stylelint()
-  .copyWatched(
-    `${resourcesDirName}/assets/images`,
-    `${publicDirName}/assets/images`,
-    { base: `${resourcesDirName}/assets/images` }
-  )
   .pug(
     `${resourcesDirName}/views/**/[!_]*.pug`,
     publicDirName,
@@ -104,27 +94,24 @@ mix
 
 // Only in production mode
 if (process.env.NODE_ENV === 'production') {
-  mix.then(async () => {
-    // Execute imagemin for each file in loop
-    // Because imagemin can't keep hierarchical structure
-    const targets = globby.sync(
-      `${publicDirName}/assets/images/**/*.{jpg,jpeg,png,gif}`,
-      { onlyFiles: true }
+  const patterns = [ 'assets/images/**/*' ]
+  mix
+    // Copy and minify images in production
+    .imagemin(
+      patterns,
+      { context: resourcesDirName },
+      {
+        test: filePath => !!multimatch(filePath, patterns).length,
+        optipng: { optimizationLevel: 0 }, // 0 ~ 7
+        gifsicle: { optimizationLevel: 1 }, // 1 ~ 3
+        plugins: [ require('imagemin-mozjpeg')({ quality: 100 }) ] // 0 ~ 100
+      }
     )
-    for (let target of targets) {
-      Log.feedback(`Optimizing ${target}`)
-      await imagemin([ target ], path.dirname(target), {
-        plugins: [
-          imageminMozjpeg({ quality: 100 }), // 0 ~ 100
-          imageminPngquant({ quality: [ 1, 1 ] }), // 0 ~ 1
-          imageminGifsicle({ optimizationLevel: 3 }) // 1 ~ 3
-        ]
-      }).catch(error => { throw error })
-    }
-    // In production, delete unnecesary files
-    fs.removeSync(`${publicDirName}/${svgDummyModuleName}.js`)
-    fs.removeSync(`${publicDirName}/mix-manifest.json`)
-  })
+    // Delete unnecesary files
+    .then(() => {
+      fs.removeSync(`${publicDirName}/${svgDummyModuleName}.js`)
+      fs.removeSync(`${publicDirName}/mix-manifest.json`)
+    })
 }
 
 // Only in development mode
@@ -152,5 +139,12 @@ else {
   if (cert && key) {
     options.https = { cert, key }
   }
-  mix.browserSync(options)
+  mix
+    // Copy images without minifying in development
+    .copyWatched(
+      `${resourcesDirName}/assets/images`,
+      `${publicDirName}/assets/images`,
+      { base: `${resourcesDirName}/assets/images` }
+    )
+    .browserSync(options)
 }
