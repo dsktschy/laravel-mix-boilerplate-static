@@ -64,7 +64,7 @@ mix
   .webpackConfig({
     plugins: [
       new SVGSpritemapPlugin(
-        // Subdirectories (svg/**/*.svg) are not allowed
+        // Subdirectories (sprite/**/*.svg) are not allowed
         // Because same ID attribute is output multiple times,
         // if file names are duplicated among multiple directories
         `${resourcesDirName}/assets/svg/sprite/*.svg`,
@@ -79,9 +79,7 @@ mix
             },
             svgo: {
               plugins: [
-                { removeTitle: true },
-                { cleanupIDs: true },
-                { removeAttrs: { attrs: '(fill|stroke|data.*)' } },
+                // Required to hide sprite
                 { addClassesToSVGElement: { className: 'svg-sprite' } }
               ]
             },
