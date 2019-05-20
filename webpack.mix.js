@@ -9,7 +9,6 @@ require('laravel-mix-stylelint')
 require('laravel-mix-imagemin')
 mix.pug = require('laravel-mix-pug')
 
-const svgDummyModuleName = 'assets/js/.svg-dummy-module'
 const resourcesDirName = 'resources'
 const publicDirName = 'public'
 
@@ -71,7 +70,7 @@ mix
             // In development, keep chunk file without deletion
             // Because error occurs if chunk file has deleted when creating mix-manifest.json
             chunk: {
-              name: svgDummyModuleName,
+              name: 'assets/js/.svg-dummy-module',
               keep: true
             },
             svgo: {
@@ -95,42 +94,7 @@ mix
     `${publicDirName}/assets/svg`,
     { base: `${resourcesDirName}/assets/svg` }
   )
-
-// Only in production mode
-if (process.env.NODE_ENV === 'production') {
-  const patterns = [ 'assets/images/**/*' ]
-  mix
-    // Copy and minify images in production
-    .imagemin(
-      // Options for copying
-      patterns,
-      { context: resourcesDirName },
-      // Options for optimization
-      {
-        // To find targets exactly, requires test option that is function
-        test: filePath => !!multimatch(filePath, patterns).length,
-        optipng: { optimizationLevel: 0 }, // 0 ~ 7
-        gifsicle: { optimizationLevel: 1 }, // 1 ~ 3
-        plugins: [ require('imagemin-mozjpeg')({ quality: 100 }) ] // 0 ~ 100
-      }
-    )
-    // Delete unnecesary files
-    .then(() => {
-      fs.removeSync(`${publicDirName}/${svgDummyModuleName}.js`)
-      fs.removeSync(`${publicDirName}/mix-manifest.json`)
-    })
-    // It's difficult handle public/mix-manifest.json from static pages
-    // Can use function of Pug instead of PHP, to set parameter for cache busting
-    // .version()
-}
-
-// Only in development mode
-else {
-  // Reloading is necessary to see the change of the SVG file
-  // But BrowserSync execute ingection for SVG changes
-  // Options of BrowserSync can not change this behavior
-  // https://github.com/BrowserSync/browser-sync/issues/1287
-  const options = {
+  .browserSync({
     open: false,
     host: process.env.BROWSER_SYNC_HOST || 'localhost',
     port: process.env.BROWSER_SYNC_PORT || 3000,
@@ -142,13 +106,50 @@ else {
     files: [
       `${publicDirName}/assets/**/*`,
       `${publicDirName}/**/*.html`
-    ]
-  }
-  const cert = process.env.BROWSER_SYNC_HTTPS_CERT
-  const key = process.env.BROWSER_SYNC_HTTPS_KEY
-  if (cert && key) {
-    options.https = { cert, key }
-  }
+    ],
+    https:
+      process.env.BROWSER_SYNC_HTTPS_CERT &&
+      process.env.BROWSER_SYNC_HTTPS_KEY
+        ? {
+          cert: process.env.BROWSER_SYNC_HTTPS_CERT,
+          key: process.env.BROWSER_SYNC_HTTPS_KEY
+        }
+        : false
+    // Reloading is necessary to see the change of the SVG file
+    // But BrowserSync execute ingection for SVG changes
+    // Options of BrowserSync can not change this behavior
+    // https://github.com/BrowserSync/browser-sync/issues/1287
+  })
+
+// Only in production mode
+if (process.env.NODE_ENV === 'production') {
+  mix
+    // Copy and minify images in production
+    .imagemin(
+      // Options for copying
+      [ 'assets/images/**/*' ],
+      { context: resourcesDirName },
+      // Options for optimization
+      {
+        // To find targets exactly, requires test option that is function
+        test: filePath => !!multimatch(filePath, [ 'assets/images/**/*' ]).length,
+        optipng: { optimizationLevel: 0 }, // 0 ~ 7
+        gifsicle: { optimizationLevel: 1 }, // 1 ~ 3
+        plugins: [ require('imagemin-mozjpeg')({ quality: 100 }) ] // 0 ~ 100
+      }
+    )
+    // Delete unnecesary files
+    .then(() => {
+      fs.removeSync(`${publicDirName}/assets/js/.svg-dummy-module.js`)
+      fs.removeSync(`${publicDirName}/mix-manifest.json`)
+    })
+    // It's difficult handle public/mix-manifest.json from static pages
+    // Can use function of Pug instead of PHP, to set parameter for cache busting
+    // .version()
+}
+
+// Only in development mode
+else {
   mix
     // Copy images without minifying in development
     .copyWatched(
@@ -156,5 +157,4 @@ else {
       `${publicDirName}/assets/images`,
       { base: `${resourcesDirName}/assets/images` }
     )
-    .browserSync(options)
 }
