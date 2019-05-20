@@ -86,6 +86,15 @@ mix
       )
     ]
   })
+  // Copy SVG that is not sprite
+  .copyWatched(
+    [
+      `${resourcesDirName}/assets/svg/!(sprite)`,
+      `${resourcesDirName}/assets/svg/!(sprite)/**/*`
+    ],
+    `${publicDirName}/assets/svg`,
+    { base: `${resourcesDirName}/assets/svg` }
+  )
 
 // Only in production mode
 if (process.env.NODE_ENV === 'production') {
