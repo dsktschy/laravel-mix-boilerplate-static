@@ -19,9 +19,6 @@ fs.removeSync(publicDirName)
 mix
   // Set output directory of mix-manifest.json
   .setPublicPath(publicDirName)
-  // It's difficult handle public/mix-manifest.json from static pages
-  // Can use function of Pug instead of PHP, to set parameter for cache busting
-  // .version()
   .polyfill()
   .js(
     `${resourcesDirName}/assets/js/app.js`,
@@ -96,9 +93,12 @@ if (process.env.NODE_ENV === 'production') {
   mix
     // Copy and minify images in production
     .imagemin(
+      // Options for copying
       patterns,
       { context: resourcesDirName },
+      // Options for optimization
       {
+        // To find targets exactly, requires test option that is function
         test: filePath => !!multimatch(filePath, patterns).length,
         optipng: { optimizationLevel: 0 }, // 0 ~ 7
         gifsicle: { optimizationLevel: 1 }, // 1 ~ 3
@@ -110,6 +110,9 @@ if (process.env.NODE_ENV === 'production') {
       fs.removeSync(`${publicDirName}/${svgDummyModuleName}.js`)
       fs.removeSync(`${publicDirName}/mix-manifest.json`)
     })
+    // It's difficult handle public/mix-manifest.json from static pages
+    // Can use function of Pug instead of PHP, to set parameter for cache busting
+    // .version()
 }
 
 // Only in development mode
