@@ -92,6 +92,10 @@ mix
     // Options of BrowserSync can not change this behavior
     // https://github.com/BrowserSync/browser-sync/issues/1287
   })
+  // First argument whether source map is output in production
+  // Second argument is source map type. Note that several types don't output map for CSS
+  // https://webpack.js.org/configuration/devtool/#devtool
+  .sourceMaps(false, 'inline-cheap-module-source-map')
   .pug(
     `${srcDirName}/views/**/[!_]*.pug`,
     distDirName,
