@@ -29,34 +29,6 @@ mix
     `${distDirName}/assets/css`
   )
   .stylelint()
-  .pug(
-    `${srcDirName}/views/**/[!_]*.pug`,
-    distDirName,
-    {
-      // Path to directory that contains JSON or YAML
-      seeds: srcDirName,
-      // Variables and functions
-      locals: {
-        // Function for cache busting
-        mix: (filePath = '') => filePath + '?id=' + Date.now(),
-        // Function to create path for SVG sprite, according to NODE_ENV
-        // Requires path to sprite SVG file and ID
-        // In development, if SVG is included in pug,
-        // injection of changes such as CSS by BrowserSync is prevented
-        // Because svg-spritemap-webpack-plugin reacts for all changes,
-        // and it causes pug recompile and browser reloading
-        svgSprite: (filePath = '', id = '') =>
-          process.env.NODE_ENV === 'production' ? id : filePath + id
-      },
-      // Base directory
-      excludePath: `${srcDirName}/views`,
-      // Options for Pug
-      pug: {
-        // Required to include partials with root relative path
-        basedir: `${srcDirName}/views`
-      }
-    }
-  )
   .webpackConfig({
     plugins: [
       new SVGSpritemapPlugin(
@@ -98,9 +70,9 @@ mix
     open: false,
     host: process.env.BROWSER_SYNC_HOST || 'localhost',
     port: process.env.BROWSER_SYNC_PORT || 3000,
-    server: distDirName,
     proxy: false,
-    // If this setting is 'wp-content/public/**/*',
+    server: distDirName,
+    // If this setting is `${distDirName}/**/*`,
     // injection of changes such as CSS will be not available
     // https://github.com/JeffreyWay/laravel-mix/issues/1053
     files: [
@@ -120,6 +92,34 @@ mix
     // Options of BrowserSync can not change this behavior
     // https://github.com/BrowserSync/browser-sync/issues/1287
   })
+  .pug(
+    `${srcDirName}/views/**/[!_]*.pug`,
+    distDirName,
+    {
+      // Path to directory that contains JSON or YAML
+      seeds: srcDirName,
+      // Variables and functions
+      locals: {
+        // Function for cache busting
+        mix: (filePath = '') => filePath + '?id=' + Date.now(),
+        // Function to create path for SVG sprite, according to NODE_ENV
+        // Requires path to sprite SVG file and ID
+        // In development, if SVG is included in pug,
+        // injection of changes such as CSS by BrowserSync is prevented
+        // Because svg-spritemap-webpack-plugin reacts for all changes,
+        // and it causes pug recompile and browser reloading
+        svgSprite: (filePath = '', id = '') =>
+          process.env.NODE_ENV === 'production' ? id : filePath + id
+      },
+      // Base directory
+      excludePath: `${srcDirName}/views`,
+      // Options for Pug
+      pug: {
+        // Required to include partials with root relative path
+        basedir: `${srcDirName}/views`
+      }
+    }
+  )
 
 // Only in production mode
 if (process.env.NODE_ENV === 'production') {
