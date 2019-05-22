@@ -9,32 +9,32 @@ require('laravel-mix-stylelint')
 require('laravel-mix-imagemin')
 mix.pug = require('laravel-mix-pug')
 
-const resourcesDirName = 'resources'
-const publicDirName = 'public'
+const srcDirName = 'resources'
+const distDirName = 'public'
 
 // Clean public directory
-fs.removeSync(publicDirName)
+fs.removeSync(distDirName)
 
 mix
   // Set output directory of mix-manifest.json
-  .setPublicPath(publicDirName)
+  .setPublicPath(distDirName)
   .polyfill()
   .js(
-    `${resourcesDirName}/assets/js/app.js`,
-    `${publicDirName}/assets/js`
+    `${srcDirName}/assets/js/app.js`,
+    `${distDirName}/assets/js`
   )
   .eslint()
   .sass(
-    `${resourcesDirName}/assets/css/app.scss`,
-    `${publicDirName}/assets/css`
+    `${srcDirName}/assets/css/app.scss`,
+    `${distDirName}/assets/css`
   )
   .stylelint()
   .pug(
-    `${resourcesDirName}/views/**/[!_]*.pug`,
-    publicDirName,
+    `${srcDirName}/views/**/[!_]*.pug`,
+    distDirName,
     {
       // Path to directory that contains JSON or YAML
-      seeds: resourcesDirName,
+      seeds: srcDirName,
       // Variables and functions
       locals: {
         // Function for cache busting
@@ -49,11 +49,11 @@ mix
           process.env.NODE_ENV === 'production' ? id : filePath + id
       },
       // Base directory
-      excludePath: `${resourcesDirName}/views`,
+      excludePath: `${srcDirName}/views`,
       // Options for Pug
       pug: {
         // Required to include partials with root relative path
-        basedir: `${resourcesDirName}/views`
+        basedir: `${srcDirName}/views`
       }
     }
   )
@@ -63,7 +63,7 @@ mix
         // Subdirectories (sprite/**/*.svg) are not allowed
         // Because same ID attribute is output multiple times,
         // if file names are duplicated among multiple directories
-        `${resourcesDirName}/assets/svg/sprite/*.svg`,
+        `${srcDirName}/assets/svg/sprite/*.svg`,
         {
           output: {
             filename: 'assets/svg/sprite.svg',
@@ -88,24 +88,24 @@ mix
   // Copy SVG that is not sprite
   .copyWatched(
     [
-      `${resourcesDirName}/assets/svg/!(sprite)`,
-      `${resourcesDirName}/assets/svg/!(sprite)/**/*`
+      `${srcDirName}/assets/svg/!(sprite)`,
+      `${srcDirName}/assets/svg/!(sprite)/**/*`
     ],
-    `${publicDirName}/assets/svg`,
-    { base: `${resourcesDirName}/assets/svg` }
+    `${distDirName}/assets/svg`,
+    { base: `${srcDirName}/assets/svg` }
   )
   .browserSync({
     open: false,
     host: process.env.BROWSER_SYNC_HOST || 'localhost',
     port: process.env.BROWSER_SYNC_PORT || 3000,
-    server: publicDirName,
+    server: distDirName,
     proxy: false,
     // If this setting is 'wp-content/public/**/*',
     // injection of changes such as CSS will be not available
     // https://github.com/JeffreyWay/laravel-mix/issues/1053
     files: [
-      `${publicDirName}/assets/**/*`,
-      `${publicDirName}/**/*.html`
+      `${distDirName}/assets/**/*`,
+      `${distDirName}/**/*.html`
     ],
     https:
       process.env.BROWSER_SYNC_HTTPS_CERT &&
@@ -128,7 +128,7 @@ if (process.env.NODE_ENV === 'production') {
     .imagemin(
       // Options for copying
       [ 'assets/images/**/*' ],
-      { context: resourcesDirName },
+      { context: srcDirName },
       // Options for optimization
       {
         // To find targets exactly, requires test option that is function
@@ -140,8 +140,8 @@ if (process.env.NODE_ENV === 'production') {
     )
     // Delete unnecesary files
     .then(() => {
-      fs.removeSync(`${publicDirName}/assets/js/.svg-dummy-module.js`)
-      fs.removeSync(`${publicDirName}/mix-manifest.json`)
+      fs.removeSync(`${distDirName}/assets/js/.svg-dummy-module.js`)
+      fs.removeSync(`${distDirName}/mix-manifest.json`)
     })
     // It's difficult handle public/mix-manifest.json from static pages
     // Can use function of Pug instead of PHP, to set parameter for cache busting
@@ -153,8 +153,8 @@ else {
   mix
     // Copy images without optimization in development
     .copyWatched(
-      `${resourcesDirName}/assets/images`,
-      `${publicDirName}/assets/images`,
-      { base: `${resourcesDirName}/assets/images` }
+      `${srcDirName}/assets/images`,
+      `${distDirName}/assets/images`,
+      { base: `${srcDirName}/assets/images` }
     )
 }
