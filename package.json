@@ -1,6 +1,6 @@
 {
   "name": "laravel-mix-boilerplate-core",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Boilerplate for WordPress and Static site, based on Laravel Mix",
   "main": "index.js",
   "scripts": {
