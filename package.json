@@ -1,7 +1,7 @@
 {
-  "name": "laravel-mix-boilerplate",
-  "version": "0.0.0",
-  "description": "Boilerplate for WordPress and Static site, based on Laravel Mix",
+  "name": "laravel-mix-boilerplate-static",
+  "version": "1.0.0",
+  "description": "Boilerplate for Static site, based on Laravel Mix",
   "main": "index.js",
   "scripts": {
     "watch": "NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
