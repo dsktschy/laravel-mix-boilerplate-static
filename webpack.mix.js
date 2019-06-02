@@ -7,7 +7,7 @@ require('laravel-mix-copy-watched')
 require('laravel-mix-eslint')
 require('laravel-mix-stylelint')
 require('laravel-mix-imagemin')
-mix.pug = require('laravel-mix-pug')
+mix.pug = require('@dsktschy/laravel-mix-pug')
 
 const srcDirName = 'resources'
 const distDirName = 'public'
