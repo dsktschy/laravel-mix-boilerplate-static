@@ -9,11 +9,14 @@ require('laravel-mix-stylelint')
 require('laravel-mix-imagemin')
 
 const srcRelativePath =
-  (process.env.MIX_SRC_RELATIVE_PATH || '')
+  (process.env.MIX_SRC_RELATIVE_PATH || 'resources')
     .replace(/\/$/, '')
 const distRelativePath =
-  (process.env.MIX_DIST_RELATIVE_PATH || '')
+  (process.env.MIX_DIST_RELATIVE_PATH || 'public')
     .replace(/\/$/, '')
+
+// Clean public directory
+fs.removeSync(distRelativePath)
 
 mix
   // Set output directory of mix-manifest.json
@@ -111,6 +114,11 @@ if (process.env.NODE_ENV === 'production') {
         plugins: [ require('imagemin-mozjpeg')({ quality: 100 }) ] // 0 ~ 100
       }
     )
+    // Delete unnecesary files
+    .then(() => {
+      fs.removeSync(`${distRelativePath}/assets/js/.svg-dummy-module.js`)
+      fs.removeSync(`${distRelativePath}/mix-manifest.json`)
+    })
 }
 
 // Only in development mode
