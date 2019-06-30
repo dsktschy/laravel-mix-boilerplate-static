@@ -8,21 +8,25 @@ require('laravel-mix-eslint')
 require('laravel-mix-stylelint')
 require('laravel-mix-imagemin')
 
-const srcDirName = ''
-const distDirName = ''
+const srcRelativePath =
+  (process.env.MIX_SRC_RELATIVE_PATH || '')
+    .replace(/\/$/, '')
+const distRelativePath =
+  (process.env.MIX_DIST_RELATIVE_PATH || '')
+    .replace(/\/$/, '')
 
 mix
   // Set output directory of mix-manifest.json
-  .setPublicPath(distDirName)
+  .setPublicPath(distRelativePath)
   .polyfill()
   .js(
-    `${srcDirName}/assets/js/app.js`,
-    `${distDirName}/assets/js`
+    `${srcRelativePath}/assets/js/app.js`,
+    `${distRelativePath}/assets/js`
   )
   .eslint()
   .sass(
-    `${srcDirName}/assets/css/app.scss`,
-    `${distDirName}/assets/css`
+    `${srcRelativePath}/assets/css/app.scss`,
+    `${distRelativePath}/assets/css`
   )
   .stylelint()
   .webpackConfig({
@@ -31,7 +35,7 @@ mix
         // Subdirectories (sprite/**/*.svg) are not allowed
         // Because same ID attribute is output multiple times,
         // if file names are duplicated among multiple directories
-        `${srcDirName}/assets/svg/sprite/*.svg`,
+        `${srcRelativePath}/assets/svg/sprite/*.svg`,
         {
           output: {
             filename: 'assets/svg/sprite.svg',
@@ -56,21 +60,21 @@ mix
   // Copy SVG that is not sprite
   .copyWatched(
     [
-      `${srcDirName}/assets/svg/!(sprite)`,
-      `${srcDirName}/assets/svg/!(sprite)/**/*`
+      `${srcRelativePath}/assets/svg/!(sprite)`,
+      `${srcRelativePath}/assets/svg/!(sprite)/**/*`
     ],
-    `${distDirName}/assets/svg`,
-    { base: `${srcDirName}/assets/svg` }
+    `${distRelativePath}/assets/svg`,
+    { base: `${srcRelativePath}/assets/svg` }
   )
   .browserSync({
     open: false,
     host: process.env.BROWSER_SYNC_HOST || 'localhost',
     port: process.env.BROWSER_SYNC_PORT || 3000,
-    // If this setting is `${distDirName}/**/*`,
+    // If this setting is `${distRelativePath}/**/*`,
     // injection of changes such as CSS will be not available
     // https://github.com/JeffreyWay/laravel-mix/issues/1053
     files: [
-      `${distDirName}/assets/**/*`,
+      `${distRelativePath}/assets/**/*`,
     ],
     https:
       process.env.BROWSER_SYNC_HTTPS_CERT &&
@@ -97,7 +101,7 @@ if (process.env.NODE_ENV === 'production') {
     .imagemin(
       // Options for copying
       [ 'assets/images/**/*' ],
-      { context: srcDirName },
+      { context: srcRelativePath },
       // Options for optimization
       {
         // To find targets exactly, requires test option that is function
@@ -114,8 +118,8 @@ else {
   mix
     // Copy images without optimization in development
     .copyWatched(
-      `${srcDirName}/assets/images`,
-      `${distDirName}/assets/images`,
-      { base: `${srcDirName}/assets/images` }
+      `${srcRelativePath}/assets/images`,
+      `${distRelativePath}/assets/images`,
+      { base: `${srcRelativePath}/assets/images` }
     )
 }
