@@ -1,6 +1,6 @@
 {
   "name": "laravel-mix-boilerplate-static",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Boilerplate for Static site, based on Laravel Mix",
   "main": "index.js",
   "scripts": {
