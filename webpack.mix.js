@@ -15,6 +15,9 @@ const srcRelativePath =
 const distRelativePath =
   (process.env.MIX_DIST_RELATIVE_PATH || 'public')
     .replace(/\/$/, '')
+const basePath =
+  (process.env.MIX_BASE_PATH || '')
+    .replace(/\/$/, '')
 
 // Clean public directory
 fs.removeSync(distRelativePath)
@@ -110,7 +113,7 @@ mix
       // Variables and functions
       locals: {
         // Function for cache busting
-        mix: (filePath = '') => filePath + '?id=' + Date.now(),
+        mix: (filePath = '') => basePath + filePath + '?id=' + Date.now(),
         // Function to create path for SVG sprite, according to NODE_ENV
         // Requires path to sprite SVG file and ID
         // In development, if SVG is included in pug,
@@ -118,7 +121,7 @@ mix
         // Because svg-spritemap-webpack-plugin reacts for all changes,
         // and it causes pug recompile and browser reloading
         svgSprite: (filePath = '', id = '') =>
-          process.env.NODE_ENV === 'production' ? id : filePath + id
+          process.env.NODE_ENV === 'production' ? id : basePath + filePath + id
       },
       // Base directory
       excludePath: `${srcRelativePath}/views`,
