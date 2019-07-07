@@ -33,6 +33,7 @@ mix
     `${distRelativePath}/assets/css`
   )
   .stylelint()
+  .options({ processCssUrls: false })
   .webpackConfig({
     plugins: [
       new SVGSpritemapPlugin(
