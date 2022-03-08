@@ -1,182 +1,96 @@
-const mix = require('laravel-mix')
 const fs = require('fs-extra')
-const multimatch = require('multimatch')
-const SVGSpritemapPlugin = require('svg-spritemap-webpack-plugin')
+const mix = require('laravel-mix')
 require('laravel-mix-polyfill')
-require('laravel-mix-copy-watched')
-require('laravel-mix-eslint')
-require('laravel-mix-stylelint')
-require('laravel-mix-imagemin')
 require('laravel-mix-ejs')
+require('laravel-mix-copy-watched')
+const SVGSpritemapPlugin = require('svg-spritemap-webpack-plugin')
+const bsConfig = require('./bs-config.js')
+const svgoConfig = require('./svgo.config.js')
 
-const srcRelativePath =
-  (process.env.MIX_SRC_RELATIVE_PATH || 'resources')
-    .replace(/\/$/, '')
-const distRelativePath =
-  (process.env.MIX_DIST_RELATIVE_PATH || 'public')
-    .replace(/\/$/, '')
-const basePath =
-  (process.env.MIX_BASE_PATH || '')
-    .replace(/\/$/, '')
+const srcRelativePath = process.env.MIX_SRC_RELATIVE_PATH
+const publicRelativePath = process.env.MIX_PUBLIC_RELATIVE_PATH
+const distRelativePath = process.env.MIX_DIST_RELATIVE_PATH
 
-fs.removeSync(distRelativePath)
+const legacyMode = process.env.MIX_LEGACY_MODE?.toLowerCase() === 'on'
+const browserslistConfig = [
+  'defaults',
+  'iOS >= 9',
+  legacyMode ? 'ie 11' : 'not ie 11'
+]
+
+const detailedSourceMapMode =
+  process.env.MIX_DETAILED_SOURCE_MAP_MODE?.toLowerCase() === 'on'
 
 mix
-  .setPublicPath(distRelativePath) // *1
-  .polyfill()
+  .setPublicPath(distRelativePath)
+  .version()
   .js(
-    `${srcRelativePath}/assets/js/app.js`,
-    `${distRelativePath}/assets/js`
+    `${srcRelativePath}/assets/scripts/index.js`,
+    `${distRelativePath}/assets/scripts`
   )
-  .eslint()
+  .polyfill({
+    targets: browserslistConfig.join(',')
+  })
   .sass(
-    `${srcRelativePath}/assets/css/app.scss`,
-    `${distRelativePath}/assets/css`
+    `${srcRelativePath}/assets/styles/index.scss`,
+    `${distRelativePath}/assets/styles`
   )
-  .stylelint()
-  .options({ processCssUrls: false })
+  .options({
+    autoprefixer: {
+      overrideBrowserslist: browserslistConfig
+    },
+    processCssUrls: false,
+    manifest: false
+  })
+  .sourceMaps(
+    false,
+    detailedSourceMapMode ? 'inline-cheap-module-source-map' : 'eval'
+  )
+  .ejs(
+    [`${srcRelativePath}/templates`, `${distRelativePath}/assets/sprites`],
+    distRelativePath,
+    {},
+    {
+      root: `${srcRelativePath}/templates`,
+      base: `${srcRelativePath}/templates`,
+      partials: [
+        `${srcRelativePath}/templates/partials`,
+        `${distRelativePath}/assets/sprites`
+      ]
+    }
+  )
+  .copyWatched(
+    `${srcRelativePath}/assets/images`,
+    `${distRelativePath}/assets/images`,
+    { base: `${srcRelativePath}/assets/images` }
+  )
+  .copyWatched(publicRelativePath, distRelativePath, {
+    base: publicRelativePath
+  })
   .webpackConfig({
     plugins: [
       new SVGSpritemapPlugin(
-        `${srcRelativePath}/assets/svg/sprite/*.svg`, // *2
+        `${srcRelativePath}/assets/sprites/index/*.svg`, // *2
         {
           output: {
-            filename: 'assets/svg/sprite.svg',
+            svgo: svgoConfig,
+            svg4everybody: legacyMode,
+            filename: 'assets/sprites/index.svg',
             chunk: {
-              name: 'assets/js/.svg-dummy-module',
-              keep: true // *3
-            },
-            svgo: {
-              plugins: [
-                { addAttributesToSVGElement: { attributes: [{ 'data-svg-sprite': '' }] } }
-              ]
-            },
-            svg4everybody: true
+              name: '.svg-dummy-module',
+              keep: true
+            }
           }
         }
       )
     ]
   })
-  .copyWatched(
-    [
-      `${srcRelativePath}/assets/svg/!(sprite)`,
-      `${srcRelativePath}/assets/svg/!(sprite)/**/*`
-    ],
-    `${distRelativePath}/assets/svg`,
-    { base: `${srcRelativePath}/assets/svg` }
-  )
-  .browserSync({
-    open: false,
-    host: process.env.MIX_BROWSER_SYNC_HOST || 'localhost',
-    port: process.env.MIX_BROWSER_SYNC_PORT || 3000,
-    proxy: false,
-    server: distRelativePath,
-    files: [ // *4
-      `${distRelativePath}/assets/**/*`,
-      `${distRelativePath}/**/*.html`,
-      `${distRelativePath}/**/*.php`
-    ],
-    https:
-      process.env.MIX_BROWSER_SYNC_HTTPS_CERT &&
-      process.env.MIX_BROWSER_SYNC_HTTPS_KEY
-        ? {
-          cert: process.env.MIX_BROWSER_SYNC_HTTPS_CERT,
-          key: process.env.MIX_BROWSER_SYNC_HTTPS_KEY
-        }
-        : false
+  .browserSync(bsConfig)
+  .before(() => {
+    fs.removeSync(distRelativePath)
   })
-  .sourceMaps(false, 'inline-cheap-module-source-map') // *5
-  .ejs(
-    `${srcRelativePath}/views`,
-    distRelativePath,
-    {
-      mix: (filePath = '') => // *6
-        process.env.NODE_ENV === 'production'
-          ? basePath + filePath + '?id=' + Date.now()
-          : basePath + filePath,
-      svgSprite: (filePath = '', id = '') => // *7
-        process.env.NODE_ENV === 'production'
-          ? id
-          : basePath + filePath + id
-    },
-    {
-      outputFunctionName: 'echo',
-      root: `${srcRelativePath}/views`,
-      base: `${srcRelativePath}/views`,
-      partials: `${srcRelativePath}/views/partials`
+  .after(() => {
+    if (mix.inProduction()) {
+      fs.removeSync(`${distRelativePath}/assets/scripts/.svg-dummy-module.js`)
     }
-  )
-
-if (process.env.NODE_ENV === 'production') {
-  mix
-    .imagemin(
-      [ 'assets/images/**/*' ],
-      { context: srcRelativePath },
-      {
-        test: filePath => !!multimatch(filePath, [ 'assets/images/**/*' ]).length, // *8
-        pngquant: { strip: true, quality: 100-100 }, // 0 ~ 100
-        gifsicle: { optimizationLevel: 1 }, // 1 ~ 3
-        plugins: [ require('imagemin-mozjpeg')({ quality: 100 }) ] // 0 ~ 100
-      }
-    )
-    .then(() => { // *9
-      fs.removeSync(`${distRelativePath}/assets/js/.svg-dummy-module.js`)
-      fs.removeSync(`${distRelativePath}/mix-manifest.json`)
-    })
-}
-
-else {
-  mix
-    .copyWatched( // *10
-      `${srcRelativePath}/assets/images`,
-      `${distRelativePath}/assets/images`,
-      { base: `${srcRelativePath}/assets/images` }
-    )
-}
-
-/*
-
-*1
-This method determines output directories for followings
-`mix-manifest.json`, webpackConfig, imagemin
-
-*2
-Following setting must not be set
-`${srcRelativePath}/assets/svg/sprite/** /*.svg`
-Because, file name determines id attribute, so all target file names must be unique
-
-*3
-Keep chunk file without deletion
-Because error occurs if chunk file has deleted when creating `mix-manifest.json`
-
-*4
-Following setting must not be set
-`${distRelativePath}/** /*`
-Because injection of changes such as CSS will be not available
-https://github.com/JeffreyWay/laravel-mix/issues/1053
-
-*5
-Note that several types don't output map for CSS
-https://webpack.js.org/configuration/devtool/#devtool
-
-*6
-This function mimics mix() of Laravel Mix
-
-*7
-This function creates path for SVG sprite
-In production, sprite is embed as inline code, and referenced with id without request
-In development, sprite is not embed, but requested with filepath argument as another file
-If embed in development, EJS recompilation and browser reloading are caused by SVGSpritemapPlugin, no matter what changes
-
-*8
-`test` option is required
-Because imagemin can not find targets exactly without this function
-
-*9
-Remove unnecesary files after all processings
-
-*10
-In development, copyWatched method is used instead of imagemin
-Because it is unnecessary to optimize images
-
-*/
+  })

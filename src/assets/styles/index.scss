@@ -1,0 +1,66 @@
+@forward './common.scss';
+
+@keyframes rainbow {
+  0% {
+    color: red;
+  }
+
+  14.2% {
+    color: orange;
+  }
+
+  28.5% {
+    color: yellow;
+  }
+
+  42.8% {
+    color: green;
+  }
+
+  57.1% {
+    color: blue;
+  }
+
+  71.4% {
+    color: indigo;
+  }
+
+  85.7% {
+    color: violet;
+  }
+
+  100% {
+    color: red;
+  }
+}
+
+.heading {
+  &.is-active {
+    animation: 0.5s linear infinite rainbow;
+  }
+}
+
+.image {
+  display: block;
+}
+
+.list {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  padding: 0;
+}
+
+.item + .item {
+  margin-left: 10px;
+}
+
+.trigger {
+  vertical-align: top;
+}
+
+.icon {
+  width: 30px;
+  height: 30px;
+  vertical-align: top;
+}
