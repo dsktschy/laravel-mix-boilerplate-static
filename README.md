@@ -9,3 +9,7 @@
 3. Open `http://localhost:3000` to check behavior.
 
 4. Run `npm run build` in this directory, to output production files.
+
+## Variant
+
+- [For WordPress](https://github.com/dsktschy/laravel-mix-boilerplate-wordpress)
