@@ -10,6 +10,7 @@ const svgoConfig = require('./svgo.config.js')
 const srcRelativePath = process.env.MIX_SRC_RELATIVE_PATH
 const publicRelativePath = process.env.MIX_PUBLIC_RELATIVE_PATH
 const distRelativePath = process.env.MIX_DIST_RELATIVE_PATH
+const manifestPrefix = process.env.MIX_MANIFEST_PREFIX
 
 const legacyMode = process.env.MIX_LEGACY_MODE?.toLowerCase() === 'on'
 const browserslistConfig = [
@@ -56,7 +57,8 @@ mix
       partials: [
         `${srcRelativePath}/templates/partials`,
         `${distRelativePath}/assets/sprites`
-      ]
+      ],
+      mixPrefix: manifestPrefix || ''
     }
   )
   .copyWatched(
