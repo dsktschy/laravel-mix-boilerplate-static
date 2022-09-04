@@ -41,7 +41,6 @@
     "type": "git"
   },
   "engines": {
-    "node": ">=14",
     "npm": ">=7"
   }
 }
