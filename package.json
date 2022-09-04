@@ -23,7 +23,7 @@
     "husky": "^7.0.4",
     "laravel-mix": "^6.0.43",
     "laravel-mix-copy-watched": "^3.0.0-alpha.0",
-    "laravel-mix-ejs": "^2.0.0-alpha.1",
+    "laravel-mix-ejs": "^2.0.0-alpha.2",
     "laravel-mix-eslint": "^0.2.0",
     "laravel-mix-polyfill": "^3.0.1",
     "lint-staged": "^12.3.5",
